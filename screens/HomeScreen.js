@@ -21,8 +21,14 @@ const HomeScreen = ({navigation}) => {
   const inputRef = useRef(null);
   const [pressed, setPressed] = useState(false);
   const [mobile, setMobile] = useState('');
+<<<<<<< HEAD
   const [otp, setOtp] = useState('');
   const aprl = 'https://www.fast2sms.com/dev/bulkV2';
+=======
+
+  
+  // const apiUrl = 
+>>>>>>> origin/master
 
   const sendOTP = async (mobile, otpValue) => {
     try {
