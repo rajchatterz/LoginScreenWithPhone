@@ -4,25 +4,60 @@ import {
   View,
   BackHandler,
   TextInput,
-  Keyboard,
   TouchableHighlight,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import React, {useEffect, useRef, useState} from 'react';
 import LottieView from 'lottie-react-native';
 import {useIsFocused} from '@react-navigation/native';
+import axios from 'axios';
 import {
   responsiveHeight as hp,
   responsiveScreenWidth as wp,
 } from 'react-native-responsive-dimensions';
+
 const HomeScreen = ({navigation}) => {
   const isFocused = useIsFocused();
   const inputRef = useRef(null);
   const [pressed, setPressed] = useState(false);
+  const [mobile, setMobile] = useState('');
+
+  const apiKey =
+    '1BkzsKyGO5I7QapHlTicjSnPFwAZgmroL4eb3u20J8xMhtEYUCSJuatRwLxpUBcWIb02lK6fZ3vnV4OM';
+  const apiUrl = 'https://www.fast2sms.com/dev/bulkV2';
+
+  const sendOTP = async (mobile, otpValue) => {
+    setPressed(true);
+    const route = 'otp';
+    const flash = '0';
+
+    try {
+      const response = await axios.get(apiUrl, {
+        params: {
+          authorization: apiKey,
+          route,
+          variables_values: otpValue,
+          flash,
+          numbers: mobile,
+        },
+      });
+
+      console.log('Full Response:', response.config.params);
+      console.log('Response:', response.data);
+      if (response && response.data) {
+        navigation.navigate('verify', {
+          data: response.config.params.variables_values,
+        });
+      }
+    } catch (error) {
+      console.error('Error sending OTP:', error.message);
+    } finally {
+      setPressed(false);
+    }
+  };
+
   useEffect(() => {
     const backAction = () => {
-      // Dismiss the keyboard before exiting the app
-      // inputRef.current.blur();
       BackHandler.exitApp();
       return true;
     };
@@ -32,18 +67,10 @@ const HomeScreen = ({navigation}) => {
       backAction,
     );
 
-    // Show the numeric keypad forcefully when the component mounts
     inputRef.current.focus();
 
     return () => backHandler.remove();
   }, [navigation]);
-
-  const handleKeyPress = ({nativeEvent}) => {
-    if (nativeEvent.key === 'Backspace') {
-      // Handle backspace key press here
-      console.log('Backspace key pressed');
-    }
-  };
 
   return (
     <View style={styles.container}>
@@ -55,9 +82,9 @@ const HomeScreen = ({navigation}) => {
         style={styles.textInputView}
         keyboardType="decimal-pad"
         keyboardAppearance="dark"
-        onKeyPress={handleKeyPress}
+        onChangeText={text => setMobile(text)}
       />
-      <TouchableHighlight onPress={() => setPressed(!pressed)}>
+      <TouchableHighlight onPress={() => sendOTP(mobile, '665656')}>
         <View
           style={{
             backgroundColor: 'red',
