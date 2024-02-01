@@ -22,9 +22,8 @@ const HomeScreen = ({navigation}) => {
   const [pressed, setPressed] = useState(false);
   const [mobile, setMobile] = useState('');
 
-  const apiKey =
-    '1BkzsKyGO5I7QapHlTicjSnPFwAZgmroL4eb3u20J8xMhtEYUCSJuatRwLxpUBcWIb02lK6fZ3vnV4OM';
-  const apiUrl = 'https://www.fast2sms.com/dev/bulkV2';
+  
+  // const apiUrl = 
 
   const sendOTP = async (mobile, otpValue) => {
     setPressed(true);
