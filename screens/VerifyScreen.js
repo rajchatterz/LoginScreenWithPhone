@@ -4,33 +4,39 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
+  TouchableHighlight,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useState, useRef} from 'react';
-
+import axios from 'axios';
 const VerifyScreen = ({route, navigation}) => {
-  const {data} = route.params;
+  const {data, token} = route.params;
   const [verificationCode, setVerificationCode] = useState('');
   const inputRefs = useRef([]);
 
-  const handleVerification = () => {
-    // Check if the entered verification code is correct
-    // For example, compare it with the expected code (data)
-
-    // If the code is correct, you can navigate to the next screen
-    // For example, navigate to the Home screen
-    if (data === verificationCode) {
+  const handleVerification = async () => {
+    if (data == verificationCode) {
+      // Navigate to 'Main' screen
+      await AsyncStorage.setItem('token', token);
       navigation.navigate('Main');
     } else {
-      console.log('error');
+      console.log('Verification failed');
     }
   };
+
+  // console.log(verificationCode);
+  console.log('data', data);
+  console.log('token', token);
+  console.log('vertifcation coe', verificationCode);
 
   const handleInputChange = (index, value) => {
     // Update the verification code state when a box is filled
     const newVerificationCode = verificationCode.split('');
     newVerificationCode[index] = value;
     setVerificationCode(newVerificationCode.join(''));
-
+    if (value === '' && index > 0) {
+      inputRefs.current[index - 1].focus();
+    }
     // Move focus to the next input
     if (value !== '' && index < inputRefs.current.length - 1) {
       inputRefs.current[index + 1].focus();
@@ -40,7 +46,7 @@ const VerifyScreen = ({route, navigation}) => {
   return (
     <View style={styles.container}>
       <Text>VerifyScreen</Text>
-      <Text>Data: Received {data}</Text>
+      <Text>Data: Received {data} </Text>
 
       <View style={styles.codeInputContainer}>
         {[...Array(6)].map((_, index) => (
@@ -64,23 +70,7 @@ const VerifyScreen = ({route, navigation}) => {
             height: 50,
             justifyContent: 'center',
             alignItems: 'center',
-          }}>
-          {pressed ? (
-            <LottieView
-              source={require('../assets/animation/loader1.json')}
-              style={{
-                height: 50,
-                width: 50,
-                backgroundColor: '#fafafa',
-                color: 'white',
-              }}
-              autoPlay
-              loop
-            />
-          ) : (
-            <Icon name="flag" size={30} color={'white'} />
-          )}
-        </View>
+          }}></View>
       </TouchableHighlight>
     </View>
   );

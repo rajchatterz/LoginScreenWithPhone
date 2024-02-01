@@ -21,32 +21,42 @@ const HomeScreen = ({navigation}) => {
   const inputRef = useRef(null);
   const [pressed, setPressed] = useState(false);
   const [mobile, setMobile] = useState('');
-
-  const apiKey =
-    '1BkzsKyGO5I7QapHlTicjSnPFwAZgmroL4eb3u20J8xMhtEYUCSJuatRwLxpUBcWIb02lK6fZ3vnV4OM';
-  const apiUrl = 'https://www.fast2sms.com/dev/bulkV2';
+  const [otp, setOtp] = useState('');
+  const aprl = 'https://www.fast2sms.com/dev/bulkV2';
 
   const sendOTP = async (mobile, otpValue) => {
-    setPressed(true);
-    const route = 'otp';
-    const flash = '0';
-
     try {
-      const response = await axios.get(apiUrl, {
+      setPressed(true);
+      // Fetch OTP from your local server
+      const otpResponse = await axios.get(
+        'http://192.168.144.43:3000/generate-otp',
+      );
+      const otp = otpResponse.data.otp;
+      const token = otpResponse.data.token;
+
+      // Log the fetched OTP for debugging
+      console.log('Fetched OTP:', otp);
+
+      const route = 'otp';
+      const flash = '0';
+
+      const apiResponse = await axios.get(apiUrl, {
         params: {
           authorization: apiKey,
           route,
-          variables_values: otpValue,
+          variables_values: otp,
           flash,
           numbers: mobile,
         },
       });
 
-      console.log('Full Response:', response.config.params);
-      console.log('Response:', response.data);
-      if (response && response.data) {
+      console.log('Full Response:', apiResponse.config.params);
+      console.log('API Response:', apiResponse.data);
+
+      if (apiResponse && apiResponse.data) {
         navigation.navigate('verify', {
-          data: response.config.params.variables_values,
+          data: apiResponse.config.params.variables_values,
+          token: token,
         });
       }
     } catch (error) {
